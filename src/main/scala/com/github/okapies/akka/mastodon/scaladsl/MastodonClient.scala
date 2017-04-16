@@ -68,7 +68,7 @@ object MastodonClient {
   private[this] implicit val decodeUri: Decoder[Uri] = Decoder[String].map(p => Uri(p))
 
   private[MastodonClient] def toContent(response: (Try[HttpResponse], _)): Source[String, _] = response._1 match {
-    case Success(r) => r.entity.dataBytes.map(_.decodeString(ByteString.UTF_8)).fold("")(_ + _)
+    case Success(r) => r.entity.dataBytes.fold(ByteString.empty)(_ ++ _).map(_.decodeString(ByteString.UTF_8))
     case Failure(e) => Source.failed(e)
   }
 
